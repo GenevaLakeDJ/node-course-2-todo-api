@@ -29,6 +29,17 @@ app.post('/todos', (req, res) => {
     });
 });
 
+app.get('/todos', (req, res) => {
+    Todo.find().then((todos) => {
+        // Send back as an object, so you can send additional data with it, such as a status code, etc.)
+        res.send({
+            todos,
+            code: 'asdf'
+        });
+    }, (e) => {
+        res.status(400).send(e);
+    })
+});
 
 app.listen(3000, () => {
     console.log('Started on port 3000');
