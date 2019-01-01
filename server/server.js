@@ -8,6 +8,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const {ObjectId} = require('mongodb');
 // Below was added after the above was moved, to import the mongoose.js file we created.
 // Below uses ES6 destructuring (destructures an object)
 const {mongoose} = require('./db/mongoose');
@@ -39,6 +40,32 @@ app.get('/todos', (req, res) => {
     }, (e) => {
         res.status(400).send(e);
     });
+});
+
+app.get('/todos/:id', (req, res) => {
+    // Below gets back the sent parameter....like GET /todos/1234324
+    // res.send(req.params);
+    const id = req.params.id;
+    if (!ObjectId.isValid(id)) {
+        return res.status(404).send();
+    }
+    Todo.findById(id).then((todo) => {
+        if (!todo) {
+            return res.status(404).send();
+        }
+        res.send({todo});
+    }).catch((e) => {
+        return res.status(400).send();
+    });
+    // Validate is uding isValid
+        // 404 - send() - send back empty body
+    // findById
+        // success
+            // if todo - send it back
+            // if no todo - send back 404 with empty body
+        // error
+            // 400 - send() - send back emtpy body
+
 });
 
 app.listen(3000, () => {
