@@ -1,13 +1,21 @@
+// Below has been moved to its own file - mongoose.js
+// const mongoose = require('mongoose');
+
+// // Made before native promises in JS, so identify types of promise (using mongoose native), then connect to db
+// mongoose.Promise = global.Promise;
+// mongoose.connect('mongodb://localhost:27017/TodoApp');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 
 const {ObjectId} = require('mongodb');
+// Below was added after the above was moved, to import the mongoose.js file we created.
+// Below uses ES6 destructuring (destructures an object)
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
@@ -15,7 +23,7 @@ app.post('/todos', (req, res) => {
     const todo = new Todo({
         text: req.body.text
     });
-
+    
     todo.save().then((doc) => {
         res.send(doc);
     }, (e) => {
@@ -62,8 +70,8 @@ app.get('/todos/:id', (req, res) => {
 
 });
 
-app.listen(port, () => {
-    console.log(`Started on port ${port}`);
+app.listen(3000, () => {
+    console.log('Started on port 3000');
 });
 
 module.exports = {app};
