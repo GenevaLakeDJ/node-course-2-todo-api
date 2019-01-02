@@ -12,4 +12,5 @@ const User = mongoose.model('User', {
     }
 });
 
+// export object where User: User - shortcut it for ES6
 module.exports = {User};
