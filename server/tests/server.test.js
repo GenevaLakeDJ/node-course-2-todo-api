@@ -11,7 +11,9 @@ const todos = [{
     text: 'First test todo'
 }, {
     _id: new ObjectId(),
-    text: 'Second test todo'
+    text: 'Second test todo',
+    completed: true,
+    completedAt: 333
 }];
 
 beforeEach((done) => {
@@ -141,5 +143,47 @@ describe('DELETE ./todos/:id', () => {
             .get(`/todos/${id}`)
             .expect(404)
             .end(done);
+    });
+});
+
+describe('PATCH /todos/:id', () => {
+    it('should update the todo', (done) => {
+        const hexID = todos[0]._id.toHexString();
+        const text = 'Modified text';
+
+        request(app)
+            .patch(`/todos/${hexID}`)
+            .send({
+                text, 
+                completed: true
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBe(true);
+                expect(res.body.todo.completedAt).toBeA('number');
+            })
+            .end(done)
+
+            // You could add validation for valid IDs too.
+    });
+    it('should clear completedAt when todo is not completed', (done) => {
+        const hexID = todos[0]._id.toHexString();
+        const text = 'Modified text';
+
+        request(app)
+            .patch(`/todos/${hexID}`)
+            .send({
+                text,
+                completed: false
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(text);
+                expect(res.body.todo.completed).toBe(false);
+                expect(res.body.todo.completedAt).toBe(null);
+            })
+            .end(done)
+
     });
 });
