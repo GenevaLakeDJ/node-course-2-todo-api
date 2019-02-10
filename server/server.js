@@ -1,7 +1,8 @@
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
-
 const {ObjectId} = require('mongodb');
+
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
@@ -86,6 +87,32 @@ app.delete('/todos/:id', (req, res) => {
             // if doc, send doc back with 200
         // error
             // 400 with empty body
+});
+
+app.patch('/todos/:id', (req, res) => {
+    const id = req.params.id;
+    let body = _.pick(req.body, ['text', 'completed']);
+
+    if (!ObjectId.isValid(id)) {
+        return res.status(404).send();
+    }
+
+    if (_.isBoolean(body.completed) && body.completed) {
+        body.completedAt = new Date().getTime();
+    } else {
+        body.completed = false;
+        body.completedAt = null;
+    }
+    // New:true below provides the new version back
+    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+        if(!todo) {
+            return res.status(404).send();
+        }
+
+        res.send({todo});
+    }).catch((e) => {
+        res.status(400).send();
+    })
 });
 
 app.listen(port, () => {

@@ -34,6 +34,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
         }
     }, {
         returnOriginal: false
+        // return original defaults to true, but we wanted to see the new one so we changed to false
     }).then((result) => {
         console.log(result);
     });
