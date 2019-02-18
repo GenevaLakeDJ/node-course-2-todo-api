@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -67,14 +68,29 @@ UserSchema.statics.findByToken = function (token) {
     } catch (e) {
         return Promise.reject();
     }
-    
+
     return User.findOne({
        '_id': decoded._id,
        // Quotes are required when there is a dot in the value.
        'tokens.token': token,
-       'tokens.access': 'auth' //Auth is not a variable, it's the response
+       'tokens.access': 'auth' //Auth is not a variable, it's the string response
     });
 };
+
+//Need to provide and call next below, otherwise middleware will crash.
+UserSchema.pre('save', function (next) {
+    var user = this;
+    if (user.isModified('password')) {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                user.password = hash;
+                next();
+            });
+        });
+    } else {
+        next();
+    }
+});
 
 // Define schema
 // Can use mongoose validators / schemas
