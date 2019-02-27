@@ -53,6 +53,20 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 
+UserSchema.methods.removeToken = function (token) {
+    var user = this;
+    // $pull is a mongodb operator
+    // return lets us chain together our call that we set up inside server.js
+    return user.update({
+        $pull: {
+            tokens: {
+                // could simplify below if we want in ES6
+                token: token
+            }
+        }
+    });
+};
+
 // Instance methods get called with the individual document,
 // thus var user above, but
 // Model methods get called with the model as the "this" binding
