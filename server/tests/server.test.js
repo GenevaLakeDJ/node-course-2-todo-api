@@ -304,3 +304,25 @@ describe('POST /users/login', () => {
             });
     });
 });
+
+describe('DELETE /users/me/token', () => {
+    // because it is asyncronious function, we will add done
+    it('should remove auth token on logout', (done) => {
+        request(app)
+            // Regular route, no need to inject anything so we can use a regular string.
+            .delete('/users/me/token')
+            .set('x-auth', users[0].tokens[0].token)
+            .expect(200)
+            // below is an async end call
+            .end((err, res) => {
+                if (err) {
+                    return done(err)
+                }
+
+                User.findById(users[0]._id).then((user) => {
+                    expect(user.tokens.length).toBe(0);
+                    done();
+                }).catch((e) => done(e));
+            });
+    });
+});
